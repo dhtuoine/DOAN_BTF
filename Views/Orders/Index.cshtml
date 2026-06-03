@@ -1,0 +1,313 @@
+﻿@model IEnumerable<DOAN_BTF.Models.Order>
+@{
+    ViewData["Title"] = "Đơn hàng";
+}
+
+<div class="p-6 space-y-6">
+
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900">Quản lý đơn hàng</h1>
+            <p class="text-sm text-slate-500 mt-1">
+                Theo dõi đơn thêu, trạng thái sản xuất và thông tin khách hàng.
+            </p>
+        </div>
+
+        <div class="flex gap-3">
+            @if (!User.IsInRole("Embroidery"))
+            {
+                <a asp-action="Create" class="btn-main">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                    Tạo đơn mới
+                </a>
+            }
+
+            <a asp-action="ExportExcel" class="btn-outline">
+                <span class="material-symbols-outlined text-[20px]">download</span>
+                Xuất dữ liệu
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="p-4 text-sm text-red-700 bg-red-50 rounded-2xl flex items-center gap-2 border border-red-100">
+            <span class="material-symbols-outlined text-base">error</span>
+            <span class="font-semibold">@TempData["Error"]</span>
+        </div>
+    }
+
+    <!-- FILTER -->
+    <form method="get">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+
+                <div class="lg:col-span-6">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">
+                        Tìm kiếm đơn hàng
+                    </label>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                            search
+                        </span>
+                        <input name="search"
+                               value="@ViewBag.Search"
+                               class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:bg-white focus:border-[#031635] focus:ring-4 focus:ring-blue-100 outline-none transition"
+                               placeholder="Nhập mã đơn, tên khách hàng hoặc số điện thoại..." />
+                    </div>
+                </div>
+
+                <div class="lg:col-span-3">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">
+                        Trạng thái
+                    </label>
+                    <select name="status"
+                            onchange="this.form.submit()"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:border-[#031635] focus:ring-4 focus:ring-blue-100 outline-none">
+                        <option value="">Tất cả trạng thái</option>
+                        @foreach (var s in OrderStatusConst.All)
+                        {
+                            <option value="@s" selected="@(ViewBag.Status == s ? "selected" : null)">
+                                @s
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="lg:col-span-3">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">
+                        Shop
+                    </label>
+                    <select name="shopId"
+                            onchange="this.form.submit()"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:border-[#031635] focus:ring-4 focus:ring-blue-100 outline-none">
+                        <option value="">Tất cả shop</option>
+                        @foreach (var shop in ViewBag.Shops)
+                        {
+                            <option value="@shop.Id" selected="@(ViewBag.ShopId == shop.Id ? "selected" : null)">
+                                @shop.ShopName
+                            </option>
+                        }
+                    </select>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+    <!-- TABLE -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left min-w-[1300px]">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Mã đơn</th>
+                        <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Khách hàng</th>
+                        <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">SĐT</th>
+                        <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Địa chỉ</th>
+                        <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Phòng ban</th>
+                        <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Shop</th>
+                        <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Mẫu thiết kế</th>
+                        <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Loại đơn</th>
+                        <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Trạng thái</th>
+                        <th class="px-4 py-4 text-xs font-black text-slate-500 uppercase tracking-wider">Ngày tạo</th>
+                        <th class="px-6 py-4 text-right text-xs font-black text-slate-500 uppercase tracking-wider">Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-slate-100">
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr class="hover:bg-slate-50/70 transition-colors">
+                                <td class="px-6 py-5 whitespace-nowrap">
+                                    <div class="font-black text-slate-800">@item.OrderCode</div>
+                                    <div class="text-xs text-slate-400">#@item.Id</div>
+                                </td>
+
+                                <td class="px-4 py-5 whitespace-nowrap">
+                                    <div class="font-bold text-slate-700">@item.CustomerName</div>
+                                    <div class="text-xs text-slate-400">@item.Country</div>
+                                </td>
+
+                                <td class="px-4 py-5 whitespace-nowrap text-sm text-slate-600">
+                                    @item.PhoneNumber
+                                </td>
+
+                                <td class="px-4 py-5 text-sm text-slate-600 max-w-[180px] truncate">
+                                    @item.Address
+                                </td>
+
+                                <td class="px-4 py-5 whitespace-nowrap text-sm text-slate-600">
+                                    @item.Room?.RoomName
+                                </td>
+
+                                <td class="px-4 py-5 whitespace-nowrap text-sm font-semibold text-slate-700">
+                                    @item.Shop?.ShopName
+                                </td>
+
+                                <td class="px-4 py-5">
+                                    @if (item.OrderDetails != null && item.OrderDetails.Any())
+                                    {
+                                        var count = 1;
+                                        <div class="flex flex-col gap-2 max-w-[230px]">
+                                            @foreach (var detail in item.OrderDetails)
+                                            {
+                                                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                                                    @if (!string.IsNullOrWhiteSpace(detail.ProductLink))
+                                                    {
+                                                        <a href="@detail.ProductLink"
+                                                           target="_blank"
+                                                           class="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 text-xs font-bold truncate">
+                                                            <span class="material-symbols-outlined text-[15px]">link</span>
+                                                            Mẫu thêu @(item.OrderDetails.Count > 1 ? count.ToString() : "")
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-slate-400 text-xs italic flex items-center gap-1">
+                                                            <span class="material-symbols-outlined text-[15px]">link_off</span>
+                                                            Chưa gắn link
+                                                        </span>
+                                                    }
+
+                                                    <div class="flex items-center gap-1.5 mt-2 flex-wrap">
+                                                        <span class="px-2 py-1 bg-slate-200/70 text-slate-700 rounded-lg text-[10px] font-bold">
+                                                            Màu: @(detail.ProductVariant?.Color ?? "Mặc định")
+                                                        </span>
+                                                        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-[10px] font-bold">
+                                                            Size: @(detail.ProductVariant?.Size ?? "Kfree")
+                                                        </span>
+                                                        <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-black">
+                                                            SL: @(detail.Quantity ?? 1)
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                count++;
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-slate-400 text-xs italic">Chưa có sản phẩm</span>
+                                    }
+                                </td>
+
+                                <td class="px-4 py-5 whitespace-nowrap">
+                                    @if (item.OrderDetails != null && item.OrderDetails.Any(d => d.IsCustom == true))
+                                    {
+                                        <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-100 rounded-full text-xs font-bold">
+                                            <span class="material-symbols-outlined text-[14px]">auto_fix_high</span>
+                                            Custom
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-50 text-slate-600 border border-slate-200 rounded-full text-xs font-bold">
+                                            <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                            Đơn thường
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="px-4 py-5 whitespace-nowrap">
+                                    @if (User.IsInRole("Embroidery"))
+                                    {
+                                        <form asp-action="UpdateStatus" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <select name="status"
+                                                    onchange="this.form.submit()"
+                                                    class="text-xs font-bold py-2 px-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-4 focus:ring-blue-100 outline-none">
+                                                @foreach (var s in OrderStatusConst.All)
+                                                {
+                                                    <option value="@s" selected="@(item.Status == s ? "selected" : null)">
+                                                        @s
+                                                    </option>
+                                                }
+                                            </select>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-block px-3 py-1.5 rounded-full text-xs font-black
+                                                        @(item.Status == OrderStatusConst.Chuacoao ? "bg-slate-100 text-slate-600 border border-slate-200" :
+                                                                                            item.Status == OrderStatusConst.ChoTheu ? "bg-blue-50 text-blue-700 border border-blue-100" :
+                                                                                            item.Status == OrderStatusConst.DangTheu ? "bg-amber-50 text-amber-700 border border-amber-100" :
+                                                                                            item.Status == OrderStatusConst.HoanThanh ? "bg-emerald-50 text-emerald-700 border border-emerald-100" :
+                                                                                            item.Status == OrderStatusConst.Huy ? "bg-red-50 text-red-600 border border-red-100" :
+                                                                                            "bg-purple-50 text-purple-600 border border-purple-100")">
+                                @item.Status
+                            </span>
+                                                        }
+                                </td>
+
+                                <td class="px-4 py-5 whitespace-nowrap text-sm text-slate-500">
+                                    @item.CreateAt?.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td class="px-6 py-5 text-right whitespace-nowrap">
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.Id"
+                                       class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 hover:bg-[#031635] hover:text-white text-slate-600 transition"
+                                       title="Cập nhật đơn hàng">
+                                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="11" class="text-center py-16">
+                                <div class="flex flex-col items-center justify-center text-slate-400">
+                                    <span class="material-symbols-outlined text-5xl mb-3">search_off</span>
+                                    <p class="font-bold text-slate-500">Không tìm thấy đơn hàng phù hợp</p>
+                                    <p class="text-sm">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="flex justify-center items-center gap-2 py-6 border-t border-slate-100">
+            @{
+                int startPage = Math.Max(1, (int)ViewBag.CurrentPage - 2);
+                int endPage = Math.Min((int)ViewBag.TotalPages, (int)ViewBag.CurrentPage + 2);
+
+                if (endPage - startPage < 4)
+                {
+                    if (startPage > 1) startPage = Math.Max(1, endPage - 4);
+                    else endPage = Math.Min((int)ViewBag.TotalPages, startPage + 4);
+                }
+            }
+
+            <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, search = ViewBag.Search, status = ViewBag.Status, shopId = ViewBag.ShopId })"
+               class="px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition @(ViewBag.CurrentPage <= 1 ? "pointer-events-none opacity-40" : "")">
+                «
+            </a>
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <a href="@Url.Action("Index", new { page = i, search = ViewBag.Search, status = ViewBag.Status, shopId = ViewBag.ShopId })"
+                   class="px-4 py-2 border rounded-xl text-sm font-bold transition
+                       @(i == ViewBag.CurrentPage
+                                           ? "bg-[#031635] text-white border-[#031635]"
+                                           : "border-slate-200 text-slate-600 hover:bg-slate-50")">
+                @i
+            </a>
+                        }
+
+            <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, search = ViewBag.Search, status = ViewBag.Status, shopId = ViewBag.ShopId })"
+               class="px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition @(ViewBag.CurrentPage >= ViewBag.TotalPages ? "pointer-events-none opacity-40" : "")">
+                »
+            </a>
+        </div>
+    </div>
+</div>

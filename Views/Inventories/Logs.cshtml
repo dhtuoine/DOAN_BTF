@@ -1,0 +1,56 @@
+﻿@model IEnumerable<DOAN_BTF.Models.InventoryLog>
+@{
+    ViewData["Title"] = "Nhật ký lịch sử kho";
+}
+
+
+<div class="p-8 space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 border-b border-slate-100 pb-6">
+        <div>
+            <h1 class="text-4xl font-extrabold text-[#031635] tracking-tight">Sổ nhật ký giao dịch kho</h1>
+            <p class="text-slate-400 text-sm mt-1.5 font-medium">Sao lưu lịch sử toàn bộ các giao dịch Nhập - Xuất vật tư phôi thêu</p>
+        </div>
+        <a asp-action="Index" class="px-4 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 transition flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">arrow_back</span> Trở lại kho</a>
+    </div>
+
+    <div class="bg-white rounded-[24px] border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.015)] overflow-hidden">
+        <div class="px-6 py-4.5 border-b border-slate-50 bg-slate-50/40 flex justify-between items-center">
+            <h3 class="font-bold text-slate-800 text-sm uppercase text-slate-400 tracking-wider">Bảng lưu vết kiểm toán (@Model.Count() bản ghi)</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+                <thead class="bg-slate-50/80 border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-6 py-3.5 pl-8">Thời gian tác vụ</th>
+                        <th class="px-6 py-3.5">Mặt hàng phôi</th>
+                        <th class="px-6 py-3.5 text-center">Phân loại giao dịch</th>
+                        <th class="px-6 py-3.5 text-center">Số lượng biến động</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="hover:bg-slate-50/30 transition-colors">
+                            <td class="px-6 py-4 pl-8 text-slate-500 font-medium whitespace-nowrap">@item.CreateAt?.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-slate-800">@(item.ProductVariant?.Product?.ProductName ?? "Mẫu ẩn")</div>
+                                <span class="text-[11px] font-medium text-slate-400">Màu: @item.ProductVariant?.Color | Size: @item.ProductVariant?.Size</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold border
+                                        @(item.Type == 1 ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-red-50 text-red-600 border-red-100")">
+                                    @(item.Type == 1 ? "Nhập kho phôi" : "Xuất xưởng sản xuất")
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center font-black text-base">
+                                <span class="@(item.Type == 1 ? "text-emerald-600" : "text-red-500")">
+                                    @(item.Type == 1 ? $"+{item.Quantity}" : $"-{item.Quantity}")
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,77 @@
+﻿@model DOAN_BTF.Models.ProductVariant
+@{
+    ViewData["Title"] = "Thêm biến thể sản phẩm";
+}
+
+
+<div class="p-8">
+    <div class="max-w-3xl mx-auto mb-6">
+        <nav class="flex items-center gap-2 text-sm text-slate-400 mb-2">
+            <a href="/Products/Index" class="hover:text-slate-800 transition">Sản phẩm</a>
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span class="font-semibold text-slate-800">Thêm biến thể</span>
+        </nav>
+        <h1 class="text-4xl font-extrabold text-[#031635] tracking-tight">Thêm biến thể phôi</h1>
+    </div>
+
+    <div class="max-w-3xl mx-auto bg-slate-50/60 border border-slate-100 rounded-3xl shadow-sm overflow-hidden">
+        <div class="px-8 py-5 border-b border-slate-100 bg-white flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><span class="material-symbols-outlined">palette</span></div>
+            <div>
+                <h2 class="font-bold text-slate-800 text-base">Cấu hình phân loại áo</h2>
+                <p class="text-slate-400 text-xs mt-0.5">Thiết lập chi tiết kích thước và màu vải thêu thực tế</p>
+            </div>
+        </div>
+
+        <form asp-action="Create" asp-controller="ProductVariants" method="post" class="p-8 space-y-6">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-sm text-red-600 bg-red-50 p-4 rounded-xl border border-red-100"></div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Sản phẩm gốc áp dụng</label>
+                <select asp-for="ProductId" asp-items="ViewBag.ProductId" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:ring-4 focus:ring-blue-100 focus:outline-none text-sm" required>
+                    <option value="">-- Click chọn dòng sản phẩm gốc --</option>
+                </select>
+                <span asp-validation-for="ProductId" class="text-red-500 text-xs mt-1 block"></span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Màu sắc vải phôi</label>
+                    <select asp-for="Color" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:ring-4 focus:ring-blue-100 focus:outline-none text-sm" required>
+                        <option value="">-- Chọn màu vải --</option>
+                        <option>Dusty Pink</option>
+                        <option>Cream</option>
+                        <option>Sage Green</option>
+                        <option>Forest Green</option>
+                        <option>White</option>
+                        <option>Mauve Taupe</option>
+                        <option>Salmon</option>
+                        <option>Blue</option>
+                        <option>Light Blue</option>
+                        <option>Light Pink</option>
+                    </select>
+                    <span asp-validation-for="Color" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Kích thước phôi áo (Size)</label>
+                    <select asp-for="Size" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:ring-4 focus:ring-blue-100 focus:outline-none text-sm" required>
+                        <option value="">-- Chọn Size tuổi em bé --</option>
+                        <option>0-3M</option>
+                        <option>3-6M</option>
+                        <option>6-12M</option>
+                        <option>12-18M</option>
+                        <option>18-24M</option>
+                    </select>
+                    <span asp-validation-for="Size" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+            </div>
+
+            <div class="pt-5 border-t border-slate-100 flex items-center justify-end gap-3 bg-white -mx-8 -mb-8 p-6">
+                <a href="/Products/Index" class="px-5 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">Hủy bỏ</a>
+                <button type="submit" class="px-5 py-2 rounded-xl bg-[#031635] text-white text-xs font-bold hover:bg-blue-950 shadow transition">Xác nhận lưu cấu hình</button>
+            </div>
+        </form>
+    </div>
+</div>

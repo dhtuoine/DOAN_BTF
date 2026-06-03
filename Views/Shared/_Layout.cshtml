@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] | BTF Embroidery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <link href="https://googleapis.com" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 12px;
+            background-color: #031635;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+            .btn-main:hover {
+                background-color: #0f2d63;
+                transform: translateY(-2px);
+            }
+
+        .btn-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background-color: white;
+            color: #475569;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+            .btn-outline:hover {
+                background-color: #f8fafc;
+                border-color: #cbd5e1;
+            }
+    </style>
+</head>
+<body class="bg-[#f0f2f5] text-slate-800 h-full overflow-hidden flex">
+
+    <!-- Thanh Sidebar nạp từ file Partial bên trên -->
+    <aside class="w-72 h-full flex-shrink-0">
+        @await Html.PartialAsync("_Sidebar")
+    </aside>
+
+    <!-- Khu vực nội dung bên phải -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+        <header class="flex-shrink-0">
+            @await Html.PartialAsync("_Header")
+        </header>
+
+        <main class="flex-1 overflow-y-auto position-relative">
+            <!-- Toast thông báo trạng thái -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="fixed top-5 right-5 z-50 bg-emerald-500 text-white px-5 py-3 rounded-2xl shadow-xl font-semibold flex items-center gap-2">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <span>@TempData["Success"]</span>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="fixed top-5 right-5 z-50 bg-red-500 text-white px-5 py-3 rounded-2xl shadow-xl font-semibold flex items-center gap-2">
+                    <span class="material-symbols-outlined">error</span>
+                    <span>@TempData["Error"]</span>
+                </div>
+            }
+
+            <!-- Nơi render nội dung riêng của từng trang -->
+            @RenderBody()
+        </main>
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

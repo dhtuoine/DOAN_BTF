@@ -1,0 +1,55 @@
+﻿<div class="sticky top-0 z-50 bg-[#f0f2f5] px-6 py-4">
+
+    <div class="flex items-center justify-between bg-white px-6 py-3 shadow-sm rounded-2xl border border-slate-200">
+
+        <form method="get" action="" class="w-full max-w-lg">
+            <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                <input type="text"
+                       name="search"
+                       value="@Context.Request.Query["search"]"
+                       placeholder="Tìm kiếm..."
+                       class="w-full pl-12 pr-4 py-3 rounded-2xl bg-slate-100 border border-transparent focus:bg-white focus:border-[#031635] focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all duration-300" />
+            </div>
+        </form>
+
+        <div class="flex items-center gap-5 ml-6">
+            <div class="hidden md:flex items-center gap-2 bg-[#031635]/10 px-4 py-2 rounded-full text-xs font-bold text-[#031635] whitespace-nowrap">
+                <span class="w-2 h-2 bg-[#031635] rounded-full animate-pulse"></span>
+                BTF HỆ THỐNG
+            </div>
+
+            <div class="relative cursor-pointer">
+                <span class="material-symbols-outlined text-slate-600 hover:text-[#031635] transition">notifications</span>
+                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+            </div>
+
+            <span class="material-symbols-outlined text-slate-600 hover:text-[#031635] cursor-pointer transition">settings</span>
+
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-[#031635]/10 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[#031635] text-[24px]">account_circle</span>
+                </div>
+                <div class="hidden sm:block text-sm min-w-max">
+                    <p class="font-semibold text-slate-800">@User.Identity?.Name</p>
+                    <p class="text-xs text-slate-500">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <span>Admin</span>
+                        }
+                        else if (User.IsInRole("Embroidery"))
+                        {
+
+                            <span>Embroidery</span>
+                        }
+                        else if (User.IsInRole("Sales"))
+                        {
+
+                            <span>Sales</span>
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

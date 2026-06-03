@@ -1,0 +1,406 @@
+﻿@{
+    ViewData["Title"] = "Bảng điều khiển";
+}
+
+<div class="p-8 space-y-6">
+
+    <!-- HEADER -->
+    <div>
+        <h1 class="text-3xl font-black text-slate-800">
+            Bảng điều khiển
+        </h1>
+
+        <p class="text-slate-500 mt-1">
+            Giám sát hoạt động sản xuất & đơn hàng hệ thống BTF
+        </p>
+    </div>
+
+    <!-- KPI -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Đơn đang chạy -->
+        <div class="bg-[#031635] rounded-3xl p-6 text-white shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="uppercase text-xs tracking-widest text-blue-200">
+                        Đơn hàng đang chạy
+                    </p>
+
+                    <h2 class="text-5xl font-black mt-3">
+                        @ViewBag.RunningOrders
+                    </h2>
+
+                    <p class="text-sm text-blue-200 mt-2">
+                        Đơn đang trong quá trình sản xuất
+                    </p>
+                </div>
+
+                <div class="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-3xl">
+                        manufacturing
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tồn kho -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="uppercase text-xs tracking-widest text-slate-400">
+                        Cảnh báo tồn kho
+                    </p>
+
+                    <h2 class="text-5xl font-black text-red-500 mt-3">
+                        @ViewBag.LowStockCount
+                    </h2>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Mã phôi dưới mức an toàn
+                    </p>
+                </div>
+
+                <div class="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-red-500 text-3xl">
+                        warning
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sẵn sàng giao -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="uppercase text-xs tracking-widest text-slate-400">
+                        Sẵn sàng giao hàng
+                    </p>
+
+                    <h2 class="text-5xl font-black text-emerald-500 mt-3">
+                        @ViewBag.ReadyOrders
+                    </h2>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Đơn đã hoàn thành sản xuất
+                    </p>
+                </div>
+
+                <div class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-emerald-500 text-3xl">
+                        local_shipping
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CHART -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+        <!-- Bar Chart -->
+        <div class="xl:col-span-2 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-lg font-black text-slate-800">
+                        Xu hướng sản lượng 7 ngày
+                    </h3>
+
+                    <p class="text-sm text-slate-500">
+                        Thống kê số lượng hoàn thành theo ngày
+                    </p>
+                </div>
+            </div>
+
+            <div class="h-[350px]">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+
+            <div class="mb-6">
+                <h3 class="text-lg font-black text-slate-800">
+                    Trạng thái sản xuất
+                </h3>
+
+                <p class="text-sm text-slate-500">
+                    Phân bố đơn hàng hiện tại
+                </p>
+            </div>
+
+            <div class="h-[350px]">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- PHÂN TÍCH -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+        <!-- PHÒNG BAN -->
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+
+            <div class="mb-6">
+                <h3 class="text-lg font-black text-slate-800">
+                    Tỷ trọng đơn hàng theo phòng ban
+                </h3>
+
+                <p class="text-sm text-slate-500">
+                    Phân bố sản lượng đơn giữa các bộ phận kinh doanh
+                </p>
+            </div>
+
+            <div class="h-[320px]">
+                <canvas id="departmentChart"></canvas>
+            </div>
+
+        </div>
+
+        <!-- SHOP -->
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+
+            <div class="mb-6">
+                <h3 class="text-lg font-black text-slate-800">
+                    Sản lượng chốt đơn theo shop
+                </h3>
+
+                <p class="text-sm text-slate-500">
+                    Theo dõi shop có số lượng đơn nổi bật
+                </p>
+            </div>
+
+            <div class="h-[320px]">
+                <canvas id="shopChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TOP SẢN PHẨM -->
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+
+        <div class="mb-6">
+            <h3 class="text-lg font-black text-slate-800">
+                Top mẫu mã / họa tiết thêu phổ biến
+            </h3>
+
+            <p class="text-sm text-slate-500">
+                Mẫu phôi có sản lượng tiêu thụ cao trong chu kỳ lọc
+            </p>
+        </div>
+
+        <div class="overflow-hidden rounded-2xl border border-slate-100">
+
+            <table class="w-full">
+
+                <thead class="bg-slate-50">
+                    <tr class="text-left text-sm text-slate-500">
+
+                        <th class="p-4">STT</th>
+                        <th class="p-4">Tên mẫu</th>
+                        <th class="p-4">Màu</th>
+                        <th class="p-4">Size</th>
+                        <th class="p-4 text-right">Sản lượng</th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @{
+                        int stt = 1;
+                    }
+
+                    @foreach (var item in ViewBag.TopProducts)
+                    {
+                        <tr class="border-t border-slate-100 hover:bg-slate-50 transition">
+
+                            <td class="p-4 font-semibold text-slate-700">
+                                @stt
+                            </td>
+
+                            <td class="p-4 font-bold text-slate-800">
+                                @item.Name
+                            </td>
+
+                            <td class="p-4 text-slate-600">
+                                @item.Color
+                            </td>
+
+                            <td class="p-4 text-slate-600">
+                                @item.Size
+                            </td>
+
+                            <td class="p-4 text-right">
+                                <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 font-semibold text-sm">
+                                    @item.Quantity SP
+                                </span>
+                            </td>
+
+                        </tr>
+
+                        stt++;
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- SMART AI -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl border border-blue-100 p-6">
+
+        <div class="flex items-start gap-4">
+
+            <div class="w-14 h-14 rounded-2xl bg-[#031635] text-white flex items-center justify-center">
+                <span class="material-symbols-outlined">
+                    network_intelligence
+                </span>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-black text-[#031635]">
+                    BTF Smart Forecast
+                </h3>
+
+                <p class="text-sm text-slate-600 mt-1 leading-7">
+                    Hệ thống phân tích nhận thấy lượng phôi áo trong kho hiện tại
+                    đủ đáp ứng nhu cầu thêu của xưởng dựa trên tốc độ đơn hàng ổn định
+                    trong 30 ngày qua.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+
+        // BAR CHART
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.WeeklyLabels)),
+                datasets: [{
+                    label: 'Sản lượng',
+                    data: @Html.Raw(Json.Serialize(ViewBag.WeeklyData)),
+                    backgroundColor: '#031635',
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+
+        // PIE
+        new Chart(document.getElementById('pieChart'), {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Chưa có áo',
+                    'Chờ thêu',
+                    'Đang thêu',
+                    'Hoàn thành',
+                    'Hủy'
+                ],
+                datasets: [{
+                    data: [
+                        @ViewBag.CountChuaCoAo,
+                        @ViewBag.CountChoTheu,
+                        @ViewBag.CountDangTheu,
+                        @ViewBag.CountHoanThanh,
+                        @ViewBag.CountHuy
+                    ],
+                    backgroundColor: [
+                        '#f59e0b',
+                        '#6366f1',
+                        '#3b82f6',
+                        '#10b981',
+                        '#ef4444'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%'
+            }
+        });
+
+
+        // PHÒNG BAN
+        new Chart(document.getElementById('departmentChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['PKD 1', 'PKD 2', 'PKD 3', 'PKD 4'],
+                datasets: [{
+                    data: [35, 25, 20, 20],
+                    backgroundColor: [
+                        '#031635',
+                        '#2563eb',
+                        '#10b981',
+                        '#f59e0b'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+
+        // SHOP
+        new Chart(document.getElementById('shopChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Lunet1', 'Velora1', 'Mivie2', 'Nuvie1'],
+                datasets: [{
+                    label: 'Đơn hàng',
+                    data: [120, 95, 80, 65],
+                    backgroundColor: '#031635',
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+    </script>
+
+}

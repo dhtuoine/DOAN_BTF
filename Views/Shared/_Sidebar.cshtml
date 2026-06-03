@@ -1,0 +1,142 @@
+﻿@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var userRoomId = User.FindFirst("RoomId")?.Value;
+}
+
+<nav class="w-72 h-full bg-white border-r border-slate-200 px-5 py-6 flex flex-col justify-between shadow-sm">
+
+    <div class="space-y-8">
+
+        <div class="bg-[#031635] rounded-[28px] p-5 text-white relative overflow-hidden shadow-md">
+            <div class="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10"></div>
+
+            <div class="relative z-10 flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center overflow-hidden p-1.5">
+                    <img src="~/image/btf.png" asp-append-version="true" class="w-full h-full object-contain" />
+                </div>
+
+                <div>
+                    <h1 class="font-black text-3xl leading-none">BTF</h1>
+                    <p class="text-sm mt-2">Embroidery System</p>
+                </div>
+            </div>
+
+            <div class="relative z-10 mt-5 flex items-center gap-2 text-sm">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full"></span>
+                <span>Hệ thống đang hoạt động</span>
+            </div>
+        </div>
+
+        <div>
+            <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest px-3 mb-4">
+                Menu quản lý
+            </p>
+
+            <div class="space-y-2">
+
+                <a href="/Home/Index"
+                   class="flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all
+                   @(currentController == "Home" ? "bg-[#031635] text-white shadow-lg" : "text-slate-700 hover:bg-slate-100")">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+
+                @if (User.IsInRole("Admin") || User.IsInRole("Sales"))
+                {
+                    <a href="/Orders/Index"
+                       class="flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all
+                           @(currentController == "Orders" || currentController == "OrderDetails" ? "bg-[#031635] text-white shadow-lg" : "text-slate-700 hover:bg-slate-100")">
+                        <span class="material-symbols-outlined">shopping_cart</span>
+                        <span>Đơn hàng</span>
+                    </a>
+
+                    <a href="/Products/Index"
+                       class="flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all
+                           @(currentController == "Products" || currentController == "ProductVariants" ? "bg-[#031635] text-white shadow-lg" : "text-slate-700 hover:bg-slate-100")">
+                        <span class="material-symbols-outlined">apparel</span>
+                        <span>Sản phẩm</span>
+                    </a>
+                }
+
+                @if (User.IsInRole("Admin") || User.IsInRole("Embroidery"))
+                {
+                    <a href="/Inventories/Index"
+                       class="flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all
+                           @(currentController == "Inventories" || currentController == "InventoryLogs" ? "bg-[#031635] text-white shadow-lg" : "text-slate-700 hover:bg-slate-100")">
+                        <span class="material-symbols-outlined">inventory_2</span>
+                        <span>Kho hàng</span>
+                    </a>
+                }
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a href="/Rooms/Index"
+                       class="flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all
+                           @(currentController == "Rooms" ? "bg-[#031635] text-white shadow-lg" : "text-slate-700 hover:bg-slate-100")">
+                        <span class="material-symbols-outlined">business</span>
+                        <span>Phòng ban</span>
+                    </a>
+
+                    <a href="/Analytics/Index"
+                       class="flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all
+                           @(currentController == "Analytics" ? "bg-[#031635] text-white shadow-lg" : "text-slate-700 hover:bg-slate-100")">
+                        <span class="material-symbols-outlined">monitoring</span>
+                        <span>Thống kê và dự báo</span>
+                    </a>
+
+                    <a href="/Users/Index"
+                       class="flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all
+                           @(currentController == "Users" ? "bg-[#031635] text-white shadow-lg" : "text-slate-700 hover:bg-slate-100")">
+                        <span class="material-symbols-outlined">group</span>
+                        <span>Tài khoản</span>
+                    </a>
+                }
+
+                @if (User.IsInRole("Sales") && !User.IsInRole("Admin"))
+                {
+                    <a href="/Rooms/Index?roomId=@userRoomId"
+                       class="flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all
+                           @(currentController == "Rooms" ? "bg-[#031635] text-white shadow-lg" : "text-slate-700 hover:bg-slate-100")">
+                        <span class="material-symbols-outlined">storefront</span>
+                        <span>Shop bộ phận</span>
+                    </a>
+                }
+
+                @if (User.IsInRole("Embroidery") && !User.IsInRole("Admin"))
+                {
+                    <a href="/Orders/Index"
+                       class="flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all">
+                        <span class="material-symbols-outlined">precision_manufacturing</span>
+                        <span>Tiến độ thêu</span>
+                    </a>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        <div class="bg-slate-100 rounded-3xl p-4 flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-slate-200 flex items-center justify-center text-[#031635]">
+                <span class="material-symbols-outlined">account_circle</span>
+            </div>
+
+            <div>
+                <p class="font-black text-slate-800">@User.Identity?.Name</p>
+                <p class="text-sm text-slate-500">
+                    @(User.IsInRole("Admin") ? "Admin" : User.IsInRole("Sales") ? "Sales" : "Embroidery")
+                </p>
+            </div>
+        </div>
+
+        <form asp-action="Logout" asp-controller="Account" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit"
+                    class="w-full bg-red-50 text-red-500 rounded-2xl px-5 py-4 font-bold flex items-center justify-center gap-3 hover:bg-red-100">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Đăng xuất</span>
+            </button>
+        </form>
+    </div>
+
+</nav>
