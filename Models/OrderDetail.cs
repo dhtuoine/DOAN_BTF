@@ -9,7 +9,7 @@ namespace DOAN_BTF.Models;
 public partial class OrderDetail
 {
     [Key]
-    public int Id { get; set; }
+    public int Id { get; set; } 
 
     public int? OrderId { get; set; }
 

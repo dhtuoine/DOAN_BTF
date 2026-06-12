@@ -82,8 +82,48 @@ namespace DOAN_BTF.Controllers
             ViewBag.TopProductLabels = topProductLabels;
             ViewBag.TopProductData = topProductData;
 
+            // ==========================
+            // TÍNH TRUNG BÌNH TRƯỢT 7 NGÀY
+            // ==========================
+            var dailyData = orders
+    .Where(o => o.CreateAt.HasValue)
+    .GroupBy(o => o.CreateAt!.Value.Date)
+    .Select(g => new
+    {
+        Date = g.Key,
+        TotalQty = g.Sum(o => o.OrderDetails.Sum(d => d.Quantity ?? 0))
+    })
+    .OrderBy(x => x.Date)
+    .ToList();
+
+            var movingAverageLabels = new List<string>();
+            var movingAverageData = new List<double>();
+
+            int windowSize = 7;
+
+            for (int i = 0; i < dailyData.Count; i++)
+            {
+                var window = dailyData
+                    .Skip(Math.Max(0, i - windowSize + 1))
+                    .Take(Math.Min(windowSize, i + 1))
+                    .ToList();
+
+                double avg = window.Average(x => x.TotalQty);
+
+                movingAverageLabels.Add(dailyData[i].Date.ToString("dd/MM"));
+                movingAverageData.Add(Math.Round(avg, 2));
+            }
+
+            ViewBag.MovingAverageLabels = movingAverageLabels;
+            ViewBag.MovingAverageData = movingAverageData;
+
+            var latestMovingAverage = movingAverageData.LastOrDefault();
+            ViewBag.LatestMovingAverage = latestMovingAverage;
+
+            // ==========================
+            // DỰ BÁO DỰA TRÊN TRUNG BÌNH TRƯỢT
+            // ==========================
             var primaryVariantId = topProducts.FirstOrDefault()?.VariantId;
-            var primaryVelocity = topProducts.FirstOrDefault()?.TotalQty ?? 0;
 
             if (primaryVariantId.HasValue)
             {
@@ -96,24 +136,26 @@ namespace DOAN_BTF.Controllers
                     .Include(v => v.Product)
                     .FirstOrDefaultAsync(v => v.Id == primaryVariantId);
 
-                if (currentStock <= primaryVelocity)
+                var estimatedNeed30Days = (int)Math.Ceiling(latestMovingAverage * 30);
+
+                if (currentStock <= estimatedNeed30Days)
                 {
                     ViewBag.ForecastStatus = "Danger";
                     ViewBag.ForecastMessage =
-                        $"[CẢNH BÁO NHẬP HÀNG] Mẫu phôi '{alertVariant?.Product?.ProductName} - {alertVariant?.Color}' đang có nhu cầu cao nhất ({primaryVelocity} chiếc trong 30 ngày qua). Lượng tồn hiện tại còn {currentStock} chiếc. Hệ thống đề xuất nhập thêm ít nhất {Math.Max(50, primaryVelocity * 2)} phôi áo.";
+                        $"[CẢNH BÁO NHẬP HÀNG] Mẫu phôi '{alertVariant?.Product?.ProductName} - {alertVariant?.Color}' đang có xu hướng tiêu thụ cao. Trung bình trượt 7 ngày hiện tại là {latestMovingAverage} chiếc/ngày. Dự kiến 30 ngày tới cần khoảng {estimatedNeed30Days} chiếc, trong khi tồn kho hiện tại còn {currentStock} chiếc. Hệ thống đề xuất nhập thêm phôi áo.";
                 }
                 else
                 {
                     ViewBag.ForecastStatus = "Safe";
                     ViewBag.ForecastMessage =
-                        "Hệ thống phân tích nhận thấy lượng phôi áo trong kho hiện tại đủ đáp ứng nhu cầu thêu của xưởng dựa trên tốc độ đơn hàng ổn định trong 30 ngày qua.";
+                        $"Trung bình trượt 7 ngày hiện tại là {latestMovingAverage} chiếc/ngày. Lượng tồn kho hiện tại vẫn đủ đáp ứng nhu cầu sản xuất trong thời gian tới.";
                 }
             }
             else
             {
                 ViewBag.ForecastStatus = "Info";
                 ViewBag.ForecastMessage =
-                    "Chưa đủ dữ liệu đơn hàng trong khoảng thời gian này để đưa ra dự báo chính xác.";
+                    "Chưa đủ dữ liệu đơn hàng trong khoảng thời gian này để tính trung bình trượt và đưa ra dự báo.";
             }
 
             // ==========================
@@ -126,38 +168,47 @@ namespace DOAN_BTF.Controllers
                 ViewBag.TotalCurrentStock = 21322;
 
                 ViewBag.RoomAnalytics = new List<object>
-                {
-                    new { Name = "Phòng Kinh Doanh 1", Count = 42 },
-                    new { Name = "Phòng Kinh Doanh 2", Count = 31 },
-                    new { Name = "Phòng Kinh Doanh 3", Count = 22 },
-                    new { Name = "Phòng Kinh Doanh 4", Count = 13 }
-                };
+        {
+            new { Name = "Phòng Kinh Doanh 1", Count = 42 },
+            new { Name = "Phòng Kinh Doanh 2", Count = 31 },
+            new { Name = "Phòng Kinh Doanh 3", Count = 22 },
+            new { Name = "Phòng Kinh Doanh 4", Count = 13 }
+        };
 
                 ViewBag.ShopAnalytics = new List<object>
-                {
-                    new { Name = "Lunet1", Count = 52 },
-                    new { Name = "Velora1", Count = 41 },
-                    new { Name = "Mivie2", Count = 37 },
-                    new { Name = "Nuvie1", Count = 29 }
-                };
+        {
+            new { Name = "Lunet1", Count = 52 },
+            new { Name = "Velora1", Count = 41 },
+            new { Name = "Mivie2", Count = 37 },
+            new { Name = "Nuvie1", Count = 29 }
+        };
 
                 ViewBag.TopProductLabels = new List<string>
-                {
-                    "Romper Longer - Cream [0-3]",
-                    "Bodysuit - Light Blue [3-6]",
-                    "Romper Short - Sage Green [0-3]",
-                    "Bodysuit - Coffee [12-18]",
-                    "Set Kids - White [3-6]"
-                };
+        {
+            "Romper Longer - Cream [0-3]",
+            "Bodysuit - Light Blue [3-6]",
+            "Romper Short - Sage Green [0-3]",
+            "Bodysuit - Coffee [12-18]",
+            "Set Kids - White [3-6]"
+        };
 
-                ViewBag.TopProductData = new List<int>
-                {
-                    230, 180, 150, 120, 95
-                };
+                ViewBag.TopProductData = new List<int> { 230, 180, 150, 120, 95 };
+
+                ViewBag.MovingAverageLabels = new List<string>
+        {
+            "01/06", "02/06", "03/06", "04/06", "05/06", "06/06", "07/06"
+        };
+
+                ViewBag.MovingAverageData = new List<double>
+        {
+            15, 18, 20, 22, 25, 27, 30
+        };
+
+                ViewBag.LatestMovingAverage = 30;
 
                 ViewBag.ForecastStatus = "Safe";
                 ViewBag.ForecastMessage =
-                    "Dữ liệu demo cho thấy nhu cầu sản xuất đang ổn định. Nhóm Romper Longer và Bodysuit có tỷ lệ tiêu thụ cao, hệ thống đề xuất theo dõi tồn kho các nhóm phôi này để chuẩn bị nhập hàng khi cần.";
+                    "Dữ liệu demo cho thấy trung bình trượt 7 ngày đang ở mức 30 chiếc/ngày. Nhu cầu sản xuất tương đối ổn định, hệ thống đề xuất tiếp tục theo dõi nhóm phôi Romper Longer và Bodysuit.";
             }
 
             ViewBag.Rooms = await _context.Rooms.AsNoTracking().ToListAsync();

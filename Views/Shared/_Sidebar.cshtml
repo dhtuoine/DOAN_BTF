@@ -50,9 +50,14 @@
                         <span>Đơn hàng</span>
                     </a>
 
+                   
+                }
+                @if (User.IsInRole("Admin"))
+                {
+                   
                     <a href="/Products/Index"
                        class="flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all
-                           @(currentController == "Products" || currentController == "ProductVariants" ? "bg-[#031635] text-white shadow-lg" : "text-slate-700 hover:bg-slate-100")">
+                               @(currentController == "Products" || currentController == "ProductVariants" ? "bg-[#031635] text-white shadow-lg" : "text-slate-700 hover:bg-slate-100")">
                         <span class="material-symbols-outlined">apparel</span>
                         <span>Sản phẩm</span>
                     </a>

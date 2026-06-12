@@ -47,6 +47,9 @@ namespace DOAN_BTF.Controllers
         // GET: Rooms/Create
         public IActionResult Create()
         {
+            if (!User.IsInRole("Admin"))
+                return Forbid();
+
             return View();
         }
 
@@ -55,6 +58,8 @@ namespace DOAN_BTF.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,RoomName")] Room room)
         {
+            if (!User.IsInRole("Admin"))
+                return Forbid();
             if (ModelState.IsValid)
             {
                 _context.Add(room);

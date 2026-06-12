@@ -21,10 +21,36 @@ namespace DOAN_BTF.Controllers
         // GET: Shops/Create
         public IActionResult Create(int? roomId)
         {
-            // Tự động chọn sẵn Phòng ban nếu người dùng bấm nút "Thêm shop" từ phòng đó sang
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "RoomName", roomId);
-            ViewBag.SelectedRoomId = roomId;
+            if (User.IsInRole("Sales") )
+            {
+                var roomClaim = User.FindFirst("RoomId")?.Value;
+
+                if (!int.TryParse(roomClaim, out var salesRoomId))
+                    return Forbid();
+
+                ViewBag.LockedRoomId = salesRoomId;
+
+                ViewData["RoomId"] = new SelectList(
+                    _context.Rooms.Where(r => r.Id == salesRoomId),
+                    "Id",
+                    "RoomName",
+                    salesRoomId
+                );
+            }
+            else
+            {
+                ViewBag.LockedRoomId = roomId;
+
+                ViewData["RoomId"] = new SelectList(
+                    _context.Rooms.OrderBy(r => r.RoomName),
+                    "Id",
+                    "RoomName",
+                    roomId
+                );
+            }
+
             return View();
+
         }
 
         // POST: Shops/Create
@@ -32,6 +58,16 @@ namespace DOAN_BTF.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ShopName,RoomId")] Shop shop)
         {
+            if (User.IsInRole("Sales") && !User.IsInRole("Admin"))
+            {
+                var roomClaim = User.FindFirst("RoomId")?.Value;
+
+                if (!int.TryParse(roomClaim, out var salesRoomId))
+                    return Forbid();
+
+                shop.RoomId = salesRoomId;
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(shop);

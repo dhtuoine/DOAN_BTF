@@ -5,21 +5,6 @@
 
 
 
-@if (TempData["Success"] != null)
-{
-    <div id="toast-success" class="fixed top-5 right-5 bg-emerald-500 text-white px-6 py-4 rounded-2xl shadow-2xl z-50 text-sm font-medium animate-bounce">
-        @TempData["Success"]
-    </div>
-    <script>setTimeout(() => { const t = document.getElementById("toast-success"); if (t) t.style.display = "none"; }, 3000);</script>
-}
-@if (TempData["Error"] != null)
-{
-    <div id="toast-error" class="fixed top-5 right-5 bg-red-500 text-white px-6 py-4 rounded-2xl shadow-2xl z-50 text-sm font-medium">
-        @TempData["Error"]
-    </div>
-    <script>setTimeout(() => { const t = document.getElementById("toast-error"); if (t) t.style.display = "none"; }, 4000);</script>
-}
-
 <div class="p-8">
     <div class="max-w-[1500px] mx-auto">
 
@@ -51,7 +36,11 @@
             <section class="col-span-12 xl:col-span-4">
                 <div class="flex items-center justify-between mb-5">
                     <h3 class="text-2xl font-bold text-slate-800">Phòng kinh doanh</h3>
-                    <a asp-controller="Rooms" asp-action="Create" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#031635] text-white text-sm font-semibold hover:bg-blue-900 transition-all shadow-sm">+ Thêm phòng</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Rooms" asp-action="Create" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#031635] text-white text-sm font-semibold hover:bg-blue-900 transition-all shadow-sm">Thêm phòng</a>
+                    }
+                    
                 </div>
 
                 <div class="space-y-4">
@@ -83,9 +72,12 @@
                             <h3 class="text-2xl font-bold text-slate-800">Danh sách Shop bộ phận</h3>
                             <p class="text-sm text-slate-500 mt-1">Đang xem cấu trúc: <span class="text-blue-600 font-bold">@(Model.Rooms.FirstOrDefault(r => r.Id == Model.SelectedRoomId)?.RoomName ?? "Tất cả phòng ban")</span></p>
                         </div>
+                        @if (User.IsInRole("Sales"))
+{
                         <a asp-controller="Shops" asp-action="Create" asp-route-roomId="@Model.SelectedRoomId" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-all shadow-sm">
-                            <span class="material-symbols-outlined text-[18px]">add</span> Kết nối Shop mới
+                            <span class="material-symbols-outlined text-[18px]">add</span>  Shop mới
                         </a>
+}
                     </div>
 
                     <div class="overflow-x-auto">

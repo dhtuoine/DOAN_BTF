@@ -8,7 +8,7 @@
     <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5">
         <div>
             <h1 class="text-3xl font-black text-[#031635]">
-                Thống kê & Dự báo sản xuất
+                Thống kê và dự báo sản xuất
             </h1>
             <p class="text-sm text-slate-500 mt-1">
                 Phân tích đơn hàng, sản lượng thêu và dự báo nhu cầu phôi áo theo thời gian.
@@ -211,6 +211,26 @@
             <div class="relative w-full h-[280px]">
                 <canvas id="chartBestSellers"></canvas>
             </div>
+            <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 min-h-[360px]">
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <h3 class="font-black text-slate-800">
+                            Trung bình trượt 7 ngày
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Theo dõi xu hướng sản lượng thêu trung bình theo từng ngày
+                        </p>
+                    </div>
+
+                    <div class="px-4 py-2 rounded-2xl bg-blue-50 text-blue-700 text-xs font-bold">
+                        TB hiện tại: @ViewBag.LatestMovingAverage cái/ngày
+                    </div>
+                </div>
+
+                <div class="relative w-full h-[280px]">
+                    <canvas id="chartMovingAverage"></canvas>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -339,6 +359,60 @@
             },
             plugins: {
                 legend: { display: false }
+            }
+        }
+    });
+
+        new Chart(document.getElementById('chartMovingAverage'), {
+        type: 'line',
+        data: {
+            labels: movingAverageLabels.length ? movingAverageLabels : ['Chưa có dữ liệu'],
+            datasets: [{
+                label: 'Trung bình trượt 7 ngày',
+                data: movingAverageData.length ? movingAverageData : [0],
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                borderWidth: 3,
+                tension: 0.35,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11, weight: '600' } }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#f1f5f9' },
+                    ticks: {
+                        callback: function(value) {
+                            return value + ' cái';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        usePointStyle: true,
+
+                        font: { size: 12, weight: '600' }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Trung bình: ' + context.raw + ' cái/ngày';
+                        }
+                    }
+                }
             }
         }
     });

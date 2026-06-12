@@ -68,15 +68,18 @@ namespace DOAN_BTF.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-            var order = await _context.Orders.Include(o => o.Room).Include(o => o.Shop).FirstOrDefaultAsync(m => m.Id == id);
+            var order = await _context.Orders
+    .Include(o => o.OrderDetails)
+        .ThenInclude(d => d.ProductVariant)
+    .FirstOrDefaultAsync(o => o.Id == id);
             return order == null ? NotFound() : View(order);
         }
-
+        // GET Create
         public IActionResult Create()
         {
             ViewBag.Products = _context.Products.ToList();
             ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "RoomName");
-            ViewData["ShopId"] = new SelectList(_context.Shops, "Id", "ShopName");
+            ViewData["ShopId"] = new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text");
             var variants = _context.ProductVariants.Include(v => v.Product).Select(v => new { v.Id, Name = (v.Product != null ? v.Product.ProductName : "") + " - " + v.Color + " " + v.Size }).ToList();
             ViewData["ProductVariantId"] = new SelectList(variants, "Id", "Name");
             var vm = new OrderCreateViewModel { OrderDetails = new List<OrderDetail> { new OrderDetail() } };
@@ -105,7 +108,7 @@ namespace DOAN_BTF.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateStatus(int id, string status)
+        public async Task<IActionResult> UpdateStatus(int id,string status,int page = 1,string search = "",string filterStatus = "",int? shopId = null)
         {
             var order = await _context.Orders.Include(o => o.OrderDetails).FirstOrDefaultAsync(o => o.Id == id);
             if (order == null) return NotFound();
@@ -126,7 +129,7 @@ namespace DOAN_BTF.Controllers
                     {
                         var inv = await _context.Inventories.FirstOrDefaultAsync(i => i.ProductVariantId == item.ProductVariantId);
                         inv.Quantity -= item.Quantity;
-                        _context.InventoryLogs.Add(new InventoryLog { ProductVariantId = item.ProductVariantId,Quantity = -item.Quantity, CreateAt = DateTime.Now });
+                        _context.InventoryLogs.Add(new InventoryLog { ProductVariantId = item.ProductVariantId, Quantity = -item.Quantity, CreateAt = DateTime.Now });
                     }
                     order.Status = status;
                     await _context.SaveChangesAsync();
@@ -138,94 +141,155 @@ namespace DOAN_BTF.Controllers
                 order.Status = status;
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new
+            {
+                page,
+                search,
+                status = filterStatus,
+                shopId
+            });
         }
 
         // GET: Orders/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? id, string returnUrl = null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var order = await _context.Orders
-                .Include(o => o.OrderDetails)
-                .FirstOrDefaultAsync(o => o.Id == id);
-
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            ViewBag.Products = _context.Products.ToList();
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "RoomName", order.RoomId);
-            ViewData["ShopId"] = new SelectList(_context.Shops, "Id", "ShopName", order.ShopId);
-
-            var vm = new OrderCreateViewModel
-            {
-                Id = order.Id,
-                OrderCode = order.OrderCode,
-                CustomerName = order.CustomerName,
-                PhoneNumber = order.PhoneNumber,
-                Address = order.Address,
-                Country = order.Country,
-                RoomId = order.RoomId,
-                ShopId = order.ShopId,
-                OrderDetails = order.OrderDetails.ToList()
-            };
-
-            return View(vm);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, OrderCreateViewModel vm)
-        {
-            if (id != vm.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                var order = await _context.Orders
-                    .Include(o => o.OrderDetails)
-                    .FirstOrDefaultAsync(o => o.Id == id);
-
-                if (order == null)
+            ViewBag.ReturnUrl = returnUrl;
+            
+                if (id == null)
                 {
                     return NotFound();
                 }
 
-                order.OrderCode = vm.OrderCode;
-                order.CustomerName = vm.CustomerName;
-                order.PhoneNumber = vm.PhoneNumber;
-                order.Address = vm.Address;
-                order.Country = vm.Country;
-                order.RoomId = vm.RoomId;
-                order.ShopId = vm.ShopId;
+            var order = await _context.Orders
+.Include(o => o.OrderDetails)
+    .ThenInclude(d => d.ProductVariant)
+.FirstOrDefaultAsync(o => o.Id == id);
 
-                // Xóa detail cũ
-                _context.OrderDetails.RemoveRange(order.OrderDetails);
+            if (order == null)
+                {
+                    return NotFound();
+                }
+
+                ViewBag.Products = _context.Products.ToList();
+            ViewBag.ProductVariants = _context.ProductVariants
+    .Include(v => v.Product)
+    .ToList();
+                ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "RoomName", order.RoomId);
+                ViewData["ShopId"] = new SelectList(
+        _context.Shops.Where(s => s.RoomId == order.RoomId),
+        "Id",
+        "ShopName",
+        order.ShopId
+    );
+
+                var vm = new OrderCreateViewModel
+                {
+                    Id = order.Id,
+                    OrderCode = order.OrderCode,
+                    CustomerName = order.CustomerName,
+                    PhoneNumber = order.PhoneNumber,
+                    Address = order.Address,
+                    Country = order.Country,
+                    RoomId = order.RoomId,
+                    ShopId = order.ShopId,
+                    OrderDetails = order.OrderDetails.ToList()
+                };
+
+                return View(vm);
+            }
+        
+            //POST EDIT
+            [HttpPost]
+            [ValidateAntiForgeryToken]
+            public async Task<IActionResult> Edit(int id, OrderCreateViewModel vm, string returnUrl = null)
+            {
+                if (id != vm.Id)
+                {
+                    return NotFound();
+                }
+
+                if (ModelState.IsValid)
+                {
+                    var order = await _context.Orders
+                        .Include(o => o.OrderDetails)
+                        .FirstOrDefaultAsync(o => o.Id == id);
+
+                    if (order == null)
+                    {
+                        return NotFound();
+                    }
+
+                    order.OrderCode = vm.OrderCode;
+                    order.CustomerName = vm.CustomerName;
+                    order.PhoneNumber = vm.PhoneNumber;
+                    order.Address = vm.Address;
+                    order.Country = vm.Country;
+                    order.RoomId = vm.RoomId;
+                    order.ShopId = vm.ShopId;
+
+                    // Xóa detail cũ
+                    _context.OrderDetails.RemoveRange(order.OrderDetails);
 
                 // Thêm detail mới
                 foreach (var item in vm.OrderDetails)
                 {
+                    if (item.ProductVariantId <= 0 || item.Quantity <= 0)
+                        continue;
+
+                    item.Id = 0;
                     item.OrderId = order.Id;
                     _context.OrderDetails.Add(item);
                 }
 
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(Index));
-            }
+                    if (!string.IsNullOrEmpty(returnUrl))
+                    {
+                        return Redirect(returnUrl);
+                    }
 
+                    return RedirectToAction(nameof(Index));
+                }
+            ViewBag.ProductVariants = _context.ProductVariants
+.Include(v => v.Product)
+.ToList();
             ViewBag.Products = _context.Products.ToList();
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "RoomName", vm.RoomId);
-            ViewData["ShopId"] = new SelectList(_context.Shops, "Id", "ShopName", vm.ShopId);
+                ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "RoomName", vm.RoomId);
+                ViewData["ShopId"] = new SelectList(_context.Shops, "Id", "ShopName", vm.ShopId);
 
-            return View(vm);
+                return View(vm);
+            } 
+        
+
+        public async Task<JsonResult> GetShopsByRoom(int roomId)
+        {
+            var shops = await _context.Shops
+                .Where(s => s.RoomId == roomId)
+                .OrderBy(s => s.ShopName)
+                .Select(s => new
+                {
+                    id = s.Id,
+                    shopName = s.ShopName
+                })
+                .ToListAsync();
+
+            return Json(shops);
+        }
+        public async Task<JsonResult> GetVariants(int productId)
+        {
+            var variants = await _context.ProductVariants
+                .Where(v => v.ProductId == productId)
+                .OrderBy(v => v.Color)
+                .ThenBy(v => v.Size)
+                .Select(v => new
+                {
+                    id = v.Id,
+                    color = v.Color,
+                    size = v.Size
+                })
+                .ToListAsync();
+
+            return Json(variants);
         }
     }
 }

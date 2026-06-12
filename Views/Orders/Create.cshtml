@@ -3,14 +3,10 @@
     ViewData["Title"] = "Tạo đơn hàng";
 }
 
-
-
-
-<div class="p-6 space-y-6 ">
+<div class="p-6 space-y-6">
     <div class="flex items-center justify-between">
         <div>
             <h1 class="text-3xl font-bold text-[#031635]">Tạo đơn hàng</h1>
-          
         </div>
     </div>
 
@@ -31,12 +27,14 @@
                     <label class="block text-sm font-medium text-slate-600 mb-2">Mã đơn thêu</label>
                     <input asp-for="OrderCode" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 focus:ring-4 focus:ring-blue-100 focus:outline-none" placeholder="Nhập mã đơn..." required />
                 </div>
+
                 <div>
                     <label class="block text-sm font-medium text-slate-600 mb-2">Phòng ban kinh doanh</label>
                     <select asp-for="RoomId" asp-items="ViewBag.RoomId" id="roomSelect" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-4 focus:ring-blue-100 focus:outline-none">
                         <option value="">-- Chọn phòng ban --</option>
                     </select>
                 </div>
+
                 <div>
                     <label class="block text-sm font-medium text-slate-600 mb-2">Shop bán hàng trực thuộc</label>
                     <select asp-for="ShopId" asp-items="ViewBag.ShopId" id="shopSelect" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-4 focus:ring-blue-100 focus:outline-none">
@@ -52,6 +50,7 @@
                     <span class="material-symbols-outlined text-[#031635]">apparel</span>
                     <h2 class="text-xl font-semibold text-[#031635]">Danh sách mẫu áo thêu chi tiết</h2>
                 </div>
+
                 <button type="button" onclick="addRow()" class="px-5 py-2.5 rounded-xl border border-dashed border-slate-300 text-sm font-semibold text-blue-600 bg-blue-50/50 hover:bg-blue-50 transition-all duration-300">
                     + Thêm dòng sản phẩm
                 </button>
@@ -72,9 +71,10 @@
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">Mẫu thiết kế (Link áo)</label>
                                 <input name="OrderDetails[@i].ProductLink" value="@Model.OrderDetails[i].ProductLink" placeholder="https://drive.google.com/..." class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none" />
                             </div>
+
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">Sản phẩm gốc</label>
-                                <select class="product-select w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none" data-index="@i">
+                                <select class="product-select w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
                                     <option value="">Chọn sản phẩm</option>
                                     @foreach (var item in ViewBag.Products)
                                     {
@@ -82,22 +82,31 @@
                                     }
                                 </select>
                             </div>
+
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">Màu sắc phôi</label>
                                 <select name="OrderDetails[@i].Color" class="color-select w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
                                     <option value="">Chọn màu</option>
                                 </select>
                             </div>
+
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">Kích thước (Size)</label>
                                 <select name="OrderDetails[@i].Size" class="size-select w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
                                     <option value="">Chọn size</option>
                                 </select>
+
+                                <input type="hidden"
+                                       name="OrderDetails[@i].ProductVariantId"
+                                       class="variant-id-input"
+                                       value="@Model.OrderDetails[i].ProductVariantId" />
                             </div>
+
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">Số lượng thêu</label>
                                 <input name="OrderDetails[@i].Quantity" value="@Model.OrderDetails[i].Quantity" type="number" min="1" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none" />
                             </div>
+
                             <div class="md:col-span-2 xl:col-span-5">
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">Yêu cầu/Ghi chú kỹ thuật thêu riêng biệt</label>
                                 <textarea name="OrderDetails[@i].Note" rows="2" placeholder="Ví dụ: Thêu chỉ lụa bóng, mặt sau lót keo lụa mịn..." class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none resize-none">@Model.OrderDetails[i].Note</textarea>
@@ -114,24 +123,55 @@
                     <span class="material-symbols-outlined text-[#031635]">person</span>
                     <h2 class="text-xl font-semibold text-[#031635]">Thông tin người nhận hàng</h2>
                 </div>
+
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-600 mb-1">Họ và tên khách hàng</label>
                         <input asp-for="CustomerName" placeholder="Nhập tên khách..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
                     </div>
+
                     <div>
                         <label class="block text-sm font-medium text-slate-600 mb-1">Số điện thoại liên hệ</label>
                         <input asp-for="PhoneNumber" placeholder="Nhập số điện thoại..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
                     </div>
+
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-1">Quốc gia xuất khẩu</label>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">Quốc gia </label>
                         <select asp-for="Country" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                            <option value="Việt Nam">Việt Nam</option>
-                            <option value="Mỹ">Mỹ</option>
-                            <option value="Nhật Bản">Nhật Bản</option>
-                            <option value="Hàn Quốc">Hàn Quốc</option>
+                            <option value="Vietnam">Việt Nam</option>
+                            <option value="United States">United States</option>
+                            <option value="Canada">Canada</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Germany">Germany</option>
+                            <option value="France">France</option>
+                            <option value="Italy">Italy</option>
+                            <option value="Spain">Spain</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Ireland">Ireland</option>
+                            <option value="Sweden">Sweden</option>
+                            <option value="Norway">Norway</option>
+                            <option value="Denmark">Denmark</option>
+                            <option value="Switzerland">Switzerland</option>
+                            <option value="Belgium">Belgium</option>
+                            <option value="Austria">Austria</option>
+                            <option value="Finland">Finland</option>
+                            <option value="Poland">Poland</option>
+                            <option value="Portugal">Portugal</option>
+                            <option value="Japan">Japan</option>
+                            <option value="South Korea">South Korea</option>
+                            <option value="Singapore">Singapore</option>
+                            <option value="Malaysia">Malaysia</option>
+                            <option value="Thailand">Thailand</option>
+                            <option value="Indonesia">Indonesia</option>
+                            <option value="Philippines">Philippines</option>
+                            <option value="China">China</option>
+                            <option value="India">India</option>
+                            <option value="New Zealand">New Zealand</option>
+                            <option value="South Africa">South Africa</option>
                         </select>
                     </div>
+
                     <div>
                         <label class="block text-sm font-medium text-slate-600 mb-1">Địa chỉ giao nhận chi tiết</label>
                         <textarea asp-for="Address" rows="2" placeholder="Số nhà, tên đường, khu phố, tỉnh thành..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none" required></textarea>
@@ -144,11 +184,14 @@
                     <span class="material-symbols-outlined text-[#031635]">auto_fix_high</span>
                     <h2 class="text-xl font-semibold text-[#031635]">Tùy chỉnh phân loại đơn hàng</h2>
                 </div>
+
                 <div class="grid grid-cols-2 bg-slate-100 rounded-2xl p-1 mb-6">
                     <button type="button" id="normalBtn" onclick="setCustom(false)" class="py-2.5 rounded-xl font-medium bg-white shadow text-[#031635] transition-all">Đơn xưởng thường</button>
                     <button type="button" id="customBtn" onclick="setCustom(true)" class="py-2.5 rounded-xl font-medium text-slate-500 transition-all">Đơn thêu Custom riêng</button>
                 </div>
+
                 <input type="hidden" id="isCustomInput" name="IsCustom" value="false" />
+
                 <div>
                     <label class="block text-sm font-medium text-slate-600 mb-2">Ghi chú tổng thể toàn đơn</label>
                     <textarea name="CustomNote" rows="5" placeholder="Các thông số đặc thù của đơn hàng hoặc lưu ý khâu đóng gói xuất hàng..." class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
@@ -164,141 +207,183 @@
 </div>
 
 <script>
-    // 1. Xử lý đổi Phòng ban load Cửa hàng tương ứng
-    document.getElementById("roomSelect").addEventListener("change", async function () {
-        let roomId = this.value;
-        if(!roomId) return;
-        let response = await fetch('/Orders/GetShopsByRoom?roomId=' + roomId);
-        let data = await response.json();
-        let shopSelect = document.getElementById("shopSelect");
-        shopSelect.innerHTML = '<option value="">-- Chọn cửa hàng --</option>';
-        data.forEach(shop => {
-            shopSelect.innerHTML += `<option value="${shop.id}">${shop.shopName}</option>`;
-        });
-    });
+        const roomSelect = document.getElementById("roomSelect");
+        const shopSelect = document.getElementById("shopSelect");
+        const detailContainer = document.getElementById("detail-container");
 
-    // Cấu trúc sản phẩm cache phục vụ nút thêm dòng động
-    let productOptionsHTML = `@foreach (var item in ViewBag.Products){
-    <option value="@item.Id">@item.ProductName</option>
+        if (roomSelect) {
+            roomSelect.addEventListener("change", async function () {
+                let roomId = this.value;
+
+                shopSelect.innerHTML = '<option value="">-- Chọn cửa hàng --</option>';
+
+                if (!roomId) return;
+
+                let response = await fetch('/Orders/GetShopsByRoom?roomId=' + roomId);
+                let data = await response.json();
+
+                data.forEach(shop => {
+                    shopSelect.innerHTML += `<option value="${shop.id}">${shop.shopName}</option>`;
+                });
+            });
         }
+
+        let productOptionsHTML = `@foreach (var item in ViewBag.Products)
+    {
+        <text><option value="@item.Id">@item.ProductName</option></text>
+    }
 `;
-    var localVariantCache = {};
 
-    // 2. Kỹ thuật Ủy quyền sự kiện (Event Delegation) xử lý chọn sản phẩm/màu sắc động cho mọi hàng
-    document.getElementById("detail-container").addEventListener("change", async function (e) {
-        let target = e.target;
-        let row = target.closest(".detail-row");
-        if (!row) return;
+        let localVariantCache = {};
 
-        // Khi thay đổi sản phẩm gốc
-        if (target.classList.contains("product-select")) {
-            let productId = target.value;
+        detailContainer.addEventListener("change", async function (e) {
+            let target = e.target;
+            let row = target.closest(".detail-row");
+
+            if (!row) return;
+
             let colorSelect = row.querySelector(".color-select");
             let sizeSelect = row.querySelector(".size-select");
+            let variantInput = row.querySelector(".variant-id-input");
 
-            colorSelect.innerHTML = '<option value="">Chọn màu</option>';
-            sizeSelect.innerHTML = '<option value="">Chọn size</option>';
-            if (!productId) return;
+            if (target.classList.contains("product-select")) {
+                let productId = target.value;
 
-            let data = [];
-            if (localVariantCache[productId]) {
-                data = localVariantCache[productId];
-            } else {
-                let response = await fetch('/Orders/GetVariants?productId=' + productId);
-                data = await response.json();
-                localVariantCache[productId] = data; // Lưu bộ nhớ cache chống spam API
+                colorSelect.innerHTML = '<option value="">Chọn màu</option>';
+                sizeSelect.innerHTML = '<option value="">Chọn size</option>';
+                variantInput.value = "";
+
+                if (!productId) return;
+
+                let data = [];
+
+                if (localVariantCache[productId]) {
+                    data = localVariantCache[productId];
+                } else {
+                    let response = await fetch('/Orders/GetVariants?productId=' + productId);
+                    data = await response.json();
+                    localVariantCache[productId] = data;
+                }
+
+                let colors = [...new Set(data.map(x => x.color))];
+
+                colors.forEach(color => {
+                    colorSelect.innerHTML += `<option value="${color}">${color}</option>`;
+                });
             }
 
-            let colors = [...new Set(data.map(x => x.color))];
-            colors.forEach(color => {
-                colorSelect.innerHTML += `<option value="${color}">${color}</option>`;
-            });
+            if (target.classList.contains("color-select")) {
+                let selectedColor = target.value;
+                let productSelect = row.querySelector(".product-select");
+                let productId = productSelect.value;
 
-            // Gắn chặt sự kiện đổi màu nạp size cho hàng hiện tại
-            colorSelect.onchange = function () {
-                let selectedColor = this.value;
                 sizeSelect.innerHTML = '<option value="">Chọn size</option>';
-                let sizes = data.filter(x => x.color == selectedColor);
+                variantInput.value = "";
+
+                if (!productId || !selectedColor) return;
+
+                let data = localVariantCache[productId] || [];
+
+                let sizes = data.filter(x => x.color === selectedColor);
+
                 sizes.forEach(item => {
-                    sizeSelect.innerHTML += `<option value="${item.size}">${item.size}</option>`;
+                    sizeSelect.innerHTML += `<option value="${item.id}">${item.size}</option>`;
                 });
-            };
-        }
-    });
+            }
 
-    function setCustom(isCustom) {
-        document.getElementById("isCustomInput").value = isCustom;
-        let normalBtn = document.getElementById("normalBtn");
-        let customBtn = document.getElementById("customBtn");
-
-        if (isCustom) {
-            customBtn.className = "py-2.5 rounded-xl font-medium bg-white shadow text-[#031635] transition-all";
-            normalBtn.className = "py-2.5 rounded-xl font-medium text-slate-500 transition-all";
-        } else {
-            normalBtn.className = "py-2.5 rounded-xl font-medium bg-white shadow text-[#031635] transition-all";
-            customBtn.className = "py-2.5 rounded-xl font-medium text-slate-500 transition-all";
-        }
-    }
-
-    function addRow() {
-        let container = document.getElementById("detail-container");
-        let index = container.querySelectorAll(".detail-row").length;
-        let html = `
-        <div class="detail-row bg-slate-50 border border-slate-200 rounded-3xl p-5 relative">
-            <div class="flex justify-end mb-2">
-                <button type="button" onclick="removeRow(this)" class="w-8 h-8 rounded-xl bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition-all">
-                    <span class="material-symbols-outlined text-[18px]">delete</span>
-                </button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
-                <div class="md:col-span-2 xl:col-span-1">
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Mẫu thiết kế (Link áo)</label>
-                    <input name="OrderDetails[${index}].ProductLink" placeholder="https://drive.google.com/..." class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none" />
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Sản phẩm gốc</label>
-                    <select class="product-select w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
-                        <option value="">Chọn sản phẩm</option>
-                        ${productOptionsHTML}
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Màu sắc phôi</label>
-                    <select name="OrderDetails[${index}].Color" class="color-select w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"><option value="">Chọn màu</option></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Kích thước (Size)</label>
-                    <select name="OrderDetails[${index}].Size" class="size-select w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"><option value="">Chọn size</option></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Số lượng thêu</label>
-                    <input name="OrderDetails[${index}].Quantity" type="number" min="1" value="1" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none" />
-                </div>
-                <div class="md:col-span-2 xl:col-span-5">
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Yêu cầu/Ghi chú kỹ thuật thêu riêng biệt</label>
-                    <textarea name="OrderDetails[${index}].Note" rows="2" placeholder="Ghi chú custom..." class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none resize-none"></textarea>
-                </div>
-            </div>
-        </div>`;
-        container.insertAdjacentHTML("beforeend", html);
-    }
-
-    function removeRow(button) {
-        let container = document.getElementById("detail-container");
-        if(container.querySelectorAll(".detail-row").length > 1) {
-            button.closest('.detail-row').remove();
-            reIndexRows(); // Đánh lại chỉ mục mảng tránh lệch Model Binding khi gửi về C#
-        }
-    }
-
-    function reIndexRows() {
-        let rows = document.getElementById("detail-container").querySelectorAll(".detail-row");
-        rows.forEach((row, i) => {
-            row.querySelector("input[name*='.ProductLink']").name = `OrderDetails[${i}].ProductLink`;
-            row.querySelector("select[name*='.Color']").name = `OrderDetails[${i}].Color`;
-            row.querySelector("select[name*='.Size']").name = `OrderDetails[${i}].Size`;
-            row.querySelector("input[name*='.Quantity']").name = `OrderDetails[${i}].Quantity`;
-            row.querySelector("textarea[name*='.Note']").name = `OrderDetails[${i}].Note`;
+            if (target.classList.contains("size-select")) {
+                variantInput.value = target.value;
+            }
         });
-    }
+
+        function setCustom(isCustom) {
+            document.getElementById("isCustomInput").value = isCustom;
+
+            let normalBtn = document.getElementById("normalBtn");
+            let customBtn = document.getElementById("customBtn");
+
+            if (isCustom) {
+                customBtn.className = "py-2.5 rounded-xl font-medium bg-white shadow text-[#031635] transition-all";
+                normalBtn.className = "py-2.5 rounded-xl font-medium text-slate-500 transition-all";
+            } else {
+                normalBtn.className = "py-2.5 rounded-xl font-medium bg-white shadow text-[#031635] transition-all";
+                customBtn.className = "py-2.5 rounded-xl font-medium text-slate-500 transition-all";
+            }
+        }
+
+        function addRow() {
+            let index = detailContainer.querySelectorAll(".detail-row").length;
+
+            let html = `
+            <div class="detail-row bg-slate-50 border border-slate-200 rounded-3xl p-5 relative">
+                <div class="flex justify-end mb-2">
+                    <button type="button" onclick="removeRow(this)" class="w-8 h-8 rounded-xl bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition-all">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+                    <div class="md:col-span-2 xl:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Mẫu thiết kế (Link áo)</label>
+                        <input name="OrderDetails[${index}].ProductLink" placeholder="https://drive.google.com/..." class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none" />
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Sản phẩm gốc</label>
+                        <select class="product-select w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                            <option value="">Chọn sản phẩm</option>
+                            ${productOptionsHTML}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Màu sắc phôi</label>
+                        <select name="OrderDetails[${index}].Color" class="color-select w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                            <option value="">Chọn màu</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Kích thước (Size)</label>
+                        <select name="OrderDetails[${index}].Size" class="size-select w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                            <option value="">Chọn size</option>
+                        </select>
+
+                        <input type="hidden" name="OrderDetails[${index}].ProductVariantId" class="variant-id-input" />
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Số lượng thêu</label>
+                        <input name="OrderDetails[${index}].Quantity" type="number" min="1" value="1" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none" />
+                    </div>
+
+                    <div class="md:col-span-2 xl:col-span-5">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Yêu cầu/Ghi chú kỹ thuật thêu riêng biệt</label>
+                        <textarea name="OrderDetails[${index}].Note" rows="2" placeholder="Ghi chú custom..." class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none resize-none"></textarea>
+                    </div>
+                </div>
+            </div>`;
+
+            detailContainer.insertAdjacentHTML("beforeend", html);
+        }
+
+        function removeRow(button) {
+            if (detailContainer.querySelectorAll(".detail-row").length > 1) {
+                button.closest(".detail-row").remove();
+                reIndexRows();
+            }
+        }
+
+        function reIndexRows() {
+            let rows = detailContainer.querySelectorAll(".detail-row");
+
+            rows.forEach((row, i) => {
+                row.querySelector("input[name*='.ProductLink']").name = `OrderDetails[${i}].ProductLink`;
+                row.querySelector("select[name*='.Color']").name = `OrderDetails[${i}].Color`;
+                row.querySelector("select[name*='.Size']").name = `OrderDetails[${i}].Size`;
+                row.querySelector(".variant-id-input").name = `OrderDetails[${i}].ProductVariantId`;
+                row.querySelector("input[name*='.Quantity']").name = `OrderDetails[${i}].Quantity`;
+                row.querySelector("textarea[name*='.Note']").name = `OrderDetails[${i}].Note`;
+            });
+        }
 </script>
