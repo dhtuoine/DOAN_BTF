@@ -1,38 +1,44 @@
 ﻿@{
-    ViewData["Title"] = "Thống kê và dự báo sản xuất";
+    ViewData["Title"] = "Dự báo nhu cầu sản xuất";
+
+    var aiVariant = ViewBag.AiPredictedVariant ?? "Romper Longer | 0-3 | Cream";
+    var aiAccuracy = ViewBag.AiAccuracy ?? "54.17%";
 }
 
-<div class="p-6 space-y-6">
+<div class="p-6 space-y-6 bg-slate-50 min-h-screen">
 
     <!-- HEADER -->
-    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5">
-        <div>
-            <h1 class="text-3xl font-black text-[#031635]">
-                Thống kê và dự báo sản xuất
-            </h1>
-            <p class="text-sm text-slate-500 mt-1">
-                Phân tích đơn hàng, sản lượng thêu và dự báo nhu cầu phôi áo theo thời gian.
-            </p>
+    <div class="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-[#031635] via-[#123C69] to-[#1D75D8] p-7 text-white shadow-lg">
+        <div class="relative z-10 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-[0.25em] text-blue-100 mb-2">
+                    BTF Smart Production Forecast
+                </p>
+                <h1 class="text-3xl font-black">
+                    Dự báo nhu cầu sản xuất
+                </h1>
+                <p class="text-sm text-blue-100 mt-2 max-w-2xl">
+                    Phân tích dữ liệu đơn hàng, xu hướng tiêu thụ và đề xuất biến thể phôi áo cần chuẩn bị.
+                </p>
+            </div>
+
+            <div class="bg-white/15 backdrop-blur px-5 py-3 rounded-2xl text-sm font-bold">
+                Cập nhật: @DateTime.Now.ToString("HH:mm dd/MM/yyyy")
+            </div>
         </div>
 
-        <div class="text-xs font-bold text-slate-400">
-            Cập nhật lúc: @DateTime.Now.ToString("HH:mm dd/MM/yyyy")
-        </div>
+        <div class="absolute -right-10 -bottom-16 w-56 h-56 bg-white/10 rounded-full"></div>
+        <div class="absolute right-32 -top-20 w-40 h-40 bg-white/10 rounded-full"></div>
     </div>
 
     <!-- FILTER -->
-    <form method="get"
-          action="@Url.Action("Index", "Analytics")"
+    <form method="get" action="@Url.Action("Index", "Analytics")"
           class="bg-white rounded-3xl border border-slate-100 shadow-sm p-5">
-
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
 
             <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">
-                    Phòng ban
-                </label>
-                <select name="roomId"
-                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-blue-100">
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Phòng ban</label>
+                <select name="roomId" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
                     <option value="">Tất cả phòng</option>
                     @foreach (var room in ViewBag.Rooms)
                     {
@@ -42,11 +48,8 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">
-                    Shop
-                </label>
-                <select name="shopId"
-                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-blue-100">
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Shop</label>
+                <select name="shopId" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
                     <option value="">Tất cả shop</option>
                     @foreach (var shop in ViewBag.Shops)
                     {
@@ -56,210 +59,138 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">
-                    Từ ngày
-                </label>
-                <input type="date"
-                       name="fromDate"
-                       value="@ViewBag.FromDate"
-                       class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-blue-100" />
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Từ ngày</label>
+                <input type="date" name="fromDate" value="@ViewBag.FromDate"
+                       class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" />
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">
-                    Đến ngày
-                </label>
-                <input type="date"
-                       name="toDate"
-                       value="@ViewBag.ToDate"
-                       class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-blue-100" />
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Đến ngày</label>
+                <input type="date" name="toDate" value="@ViewBag.ToDate"
+                       class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" />
             </div>
 
             <div class="flex gap-2">
                 <button type="submit"
-                        class="flex-1 px-5 py-3 rounded-2xl bg-[#031635] text-white text-sm font-bold hover:bg-[#0f2d63] shadow-md transition flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">filter_alt</span>
+                        class="flex-1 px-5 py-3 rounded-2xl bg-[#031635] text-white text-sm font-bold hover:bg-[#0f2d63] transition">
                     Lọc
                 </button>
-
                 <a href="@Url.Action("Index", "Analytics")"
-                   class="px-5 py-3 rounded-2xl border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition">
+                   class="px-5 py-3 rounded-2xl border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50">
                     Xóa
                 </a>
             </div>
-
         </div>
     </form>
 
-    <!-- STATS -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- KPI -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
 
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
-                        Đơn hàng trong chu kỳ
-                    </p>
-                    <h2 class="text-4xl font-black text-[#031635] mt-3">
-                        @ViewBag.TotalOrders
-                        <span class="text-xs font-medium text-slate-400">đơn</span>
-                    </h2>
-                    <p class="text-xs text-emerald-600 font-bold mt-2">
-                        +12% so với chu kỳ trước
-                    </p>
-                </div>
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+            <p class="text-xs font-bold text-slate-400 uppercase">Tổng đơn</p>
+            <h2 class="text-3xl font-black text-[#031635] mt-2">@ViewBag.TotalOrders</h2>
+            <p class="text-xs text-slate-400 mt-1">Đơn trong chu kỳ lọc</p>
+        </div>
 
-                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-[#031635] flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[28px]">receipt_long</span>
-                </div>
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+            <p class="text-xs font-bold text-slate-400 uppercase">Sản lượng</p>
+            <h2 class="text-3xl font-black text-emerald-600 mt-2">@ViewBag.TotalProductsEmbroidered</h2>
+            <p class="text-xs text-slate-400 mt-1">Tổng sản phẩm cần xử lý</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+            <p class="text-xs font-bold text-slate-400 uppercase">Tồn kho</p>
+            <h2 class="text-3xl font-black text-slate-800 mt-2">@ViewBag.TotalCurrentStock</h2>
+            <p class="text-xs text-slate-400 mt-1">Tổng phôi hiện có</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-blue-600 to-[#031635] p-5 rounded-3xl shadow-sm text-white">
+            <p class="text-xs font-bold text-blue-100 uppercase">Độ tin cậy AI</p>
+            <h2 class="text-3xl font-black mt-2">@aiAccuracy</h2>
+            <p class="text-xs text-blue-100 mt-1">Kết quả train ML.NET</p>
+        </div>
+
+    </div>
+
+    <!-- AI FORECAST -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+        <div class="xl:col-span-1 bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-[30px]">psychology</span>
+            </div>
+
+            <p class="text-xs font-bold text-slate-400 uppercase">AI đề xuất chuẩn bị</p>
+            <h3 class="text-xl font-black text-[#031635] mt-2 leading-snug">
+                @aiVariant
+            </h3>
+
+            <div class="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <p class="text-xs text-slate-500 font-semibold">
+                    Mô hình dựa trên tháng, mùa vụ, quốc gia, màu và size để dự đoán biến thể có khả năng phát sinh nhu cầu cao.
+                </p>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-center justify-between">
+        <div class="xl:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+            <div class="flex items-center justify-between mb-5">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
-                        Sản lượng thêu xong
-                    </p>
-                    <h2 class="text-4xl font-black text-emerald-600 mt-3">
-                        @ViewBag.TotalProductsEmbroidered
-                        <span class="text-xs font-medium text-slate-400">cái</span>
-                    </h2>
-                    <p class="text-xs text-emerald-600 font-bold mt-2">
-                        Năng suất ổn định
-                    </p>
-                </div>
-
-                <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[28px]">apparel</span>
+                    <h3 class="font-black text-slate-800">Top biến thể tiêu thụ cao</h3>
+                    <p class="text-xs text-slate-400 mt-1">Dùng để đối chiếu với kết quả dự báo AI</p>
                 </div>
             </div>
-        </div>
 
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
-                        Tồn kho phôi tổng lực
-                    </p>
-                    <h2 class="text-4xl font-black text-slate-800 mt-3">
-                        @ViewBag.TotalCurrentStock
-                        <span class="text-xs font-medium text-slate-400">cái</span>
-                    </h2>
-                    <p class="text-xs text-blue-600 font-bold mt-2">
-                        Đủ đáp ứng sản xuất
-                    </p>
-                </div>
-
-                <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[28px]">warehouse</span>
-                </div>
+            <div class="relative w-full h-[260px]">
+                <canvas id="chartBestSellers"></canvas>
             </div>
         </div>
 
     </div>
 
-    <!-- CHARTS -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 min-h-[360px]">
-            <div class="flex items-center justify-between mb-5">
-                <div>
-                    <h3 class="font-black text-slate-800">
-                        Tỷ trọng đơn hàng theo phòng ban
-                    </h3>
-                    <p class="text-xs text-slate-400 mt-1">
-                        Phân bổ số lượng đơn giữa các bộ phận kinh doanh
-                    </p>
-                </div>
+    <!-- FORECAST MESSAGE -->
+    <div class="rounded-3xl border border-blue-100 bg-blue-50 p-5 shadow-sm">
+        <div class="flex items-start gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-[#031635] text-white flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-[28px]">online_prediction</span>
             </div>
 
-            <div class="relative w-full h-[280px]">
-                <canvas id="chartRooms"></canvas>
+            <div>
+                <h4 class="font-black text-lg text-[#031635]">
+                    Khuyến nghị sản xuất thông minh
+                </h4>
+                <p class="text-sm leading-relaxed font-medium text-blue-900 mt-1">
+                    @ViewBag.ForecastMessage
+                </p>
             </div>
         </div>
+    </div>
 
-        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 min-h-[360px]">
-            <div class="flex items-center justify-between mb-5">
-                <div>
-                    <h3 class="font-black text-slate-800">
-                        Sản lượng chốt đơn theo shop
-                    </h3>
-                    <p class="text-xs text-slate-400 mt-1">
-                        Theo dõi shop có số lượng đơn nổi bật
-                    </p>
-                </div>
-            </div>
+    <!-- SECONDARY CHARTS -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            <div class="relative w-full h-[280px]">
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+            <h3 class="font-black text-slate-800 mb-1">Sản lượng theo shop</h3>
+            <p class="text-xs text-slate-400 mb-5">Theo dõi nguồn đơn phát sinh</p>
+            <div class="relative w-full h-[230px]">
                 <canvas id="chartShops"></canvas>
             </div>
         </div>
 
-        <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 min-h-[360px]">
-            <div class="flex items-center justify-between mb-5">
-                <div>
-                    <h3 class="font-black text-slate-800">
-                        Top mẫu mã / họa tiết thêu phổ biến
-                    </h3>
-                    <p class="text-xs text-slate-400 mt-1">
-                        Mẫu phôi có sản lượng tiêu thụ cao trong chu kỳ lọc
-                    </p>
-                </div>
-            </div>
-
-            <div class="relative w-full h-[280px]">
-                <canvas id="chartBestSellers"></canvas>
-            </div>
-            <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 min-h-[360px]">
-                <div class="flex items-center justify-between mb-5">
-                    <div>
-                        <h3 class="font-black text-slate-800">
-                            Trung bình trượt 7 ngày
-                        </h3>
-                        <p class="text-xs text-slate-400 mt-1">
-                            Theo dõi xu hướng sản lượng thêu trung bình theo từng ngày
-                        </p>
-                    </div>
-
-                    <div class="px-4 py-2 rounded-2xl bg-blue-50 text-blue-700 text-xs font-bold">
-                        TB hiện tại: @ViewBag.LatestMovingAverage cái/ngày
-                    </div>
-                </div>
-
-                <div class="relative w-full h-[280px]">
-                    <canvas id="chartMovingAverage"></canvas>
-                </div>
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+            <h3 class="font-black text-slate-800 mb-1">Phân bổ theo phòng ban</h3>
+            <p class="text-xs text-slate-400 mb-5">Phục vụ quản lý nội bộ</p>
+            <div class="relative w-full h-[230px]">
+                <canvas id="chartRooms"></canvas>
             </div>
         </div>
 
     </div>
-
-    <!-- FORECAST -->
-    <div class="rounded-3xl border border-dashed @(ViewBag.ForecastStatus == "Danger" ? "border-red-300 bg-red-50 text-red-900" : "border-blue-200 bg-blue-50 text-blue-900") p-6 shadow-sm">
-        <div class="flex items-start gap-4">
-
-            <div class="w-14 h-14 rounded-2xl @(ViewBag.ForecastStatus == "Danger" ? "bg-red-500 text-white" : "bg-[#031635] text-white") flex items-center justify-center flex-shrink-0 shadow-md">
-                <span class="material-symbols-outlined text-[28px]">online_prediction</span>
-            </div>
-
-            <div class="space-y-1.5 flex-1">
-                <h4 class="font-black text-lg tracking-tight">
-                    BTF Smart Forecast
-                </h4>
-
-                <p class="text-sm leading-relaxed font-medium">
-                    @ViewBag.ForecastMessage
-                </p>
-            </div>
-
-        </div>
-    </div>
-
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-        const roomLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(((IEnumerable<dynamic>)ViewBag.RoomAnalytics).Select(x => x.Name)));
+    const roomLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(((IEnumerable<dynamic>)ViewBag.RoomAnalytics).Select(x => x.Name)));
     const roomData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(((IEnumerable<dynamic>)ViewBag.RoomAnalytics).Select(x => x.Count)));
 
     const shopLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(((IEnumerable<dynamic>)ViewBag.ShopAnalytics).Select(x => x.Name)));
@@ -268,68 +199,7 @@
     const topLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.TopProductLabels));
     const topData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.TopProductData));
 
-
-    const chartColors = ['#031635', '#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
-
-    new Chart(document.getElementById('chartRooms'), {
-        type: 'doughnut',
-        data: {
-            labels: roomLabels.length ? roomLabels : ['Chưa có dữ liệu'],
-            datasets: [{
-                data: roomData.length ? roomData : [1],
-                backgroundColor: chartColors,
-                borderWidth: 4,
-                borderColor: '#ffffff',
-                hoverOffset: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '62%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        boxWidth: 8,
-                        font: { size: 12, weight: '600' }
-                    }
-                }
-            }
-        }
-    });
-
-    new Chart(document.getElementById('chartShops'), {
-        type: 'bar',
-        data: {
-            labels: shopLabels.length ? shopLabels : ['Chưa có shop'],
-            datasets: [{
-                label: 'Số đơn',
-                data: shopData.length ? shopData : [0],
-                backgroundColor: '#031635',
-                borderRadius: 12,
-                barThickness: 34
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: { font: { size: 11, weight: '600' } }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: { color: '#f1f5f9' }
-                }
-            },
-            plugins: {
-                legend: { display: false }
-            }
-        }
-    });
+    const chartColors = ['#031635', '#2563eb', '#38bdf8', '#10b981', '#f59e0b', '#8b5cf6'];
 
     new Chart(document.getElementById('chartBestSellers'), {
         type: 'bar',
@@ -339,8 +209,9 @@
                 label: 'Sản lượng',
                 data: topData.length ? topData : [0],
                 backgroundColor: '#2563eb',
+
                 borderRadius: 12,
-                barThickness: 28
+                barThickness: 22
             }]
         },
         options: {
@@ -348,70 +219,54 @@
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: {
-                    beginAtZero: true,
-                    grid: { color: '#f1f5f9' }
-                },
-                y: {
-                    grid: { display: false },
-                    ticks: { font: { size: 11, weight: '600' } }
-                }
+                x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                y: { grid: { display: false }, ticks: { font: { size: 11, weight: '600' } } }
             },
-            plugins: {
-                legend: { display: false }
-            }
+            plugins: { legend: { display: false } }
         }
     });
 
-        new Chart(document.getElementById('chartMovingAverage'), {
-        type: 'line',
+    new Chart(document.getElementById('chartShops'), {
+        type: 'bar',
         data: {
-            labels: movingAverageLabels.length ? movingAverageLabels : ['Chưa có dữ liệu'],
+            labels: shopLabels.length ? shopLabels : ['Chưa có shop'],
             datasets: [{
-                label: 'Trung bình trượt 7 ngày',
-                data: movingAverageData.length ? movingAverageData : [0],
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.12)',
-                borderWidth: 3,
-                tension: 0.35,
-                fill: true,
-                pointRadius: 4,
-                pointHoverRadius: 6
+                data: shopData.length ? shopData : [0],
+                backgroundColor: '#031635',
+                borderRadius: 12,
+                barThickness: 30
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: { font: { size: 11, weight: '600' } }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: { color: '#f1f5f9' },
-                    ticks: {
-                        callback: function(value) {
-                            return value + ' cái';
-                        }
-                    }
-                }
+                x: { grid: { display: false }, ticks: { font: { size: 11, weight: '600' } } },
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' } }
             },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    new Chart(document.getElementById('chartRooms'), {
+        type: 'doughnut',
+        data: {
+            labels: roomLabels.length ? roomLabels : ['Chưa có dữ liệu'],
+            datasets: [{
+                data: roomData.length ? roomData : [1],
+                backgroundColor: chartColors,
+                borderWidth: 4,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
             plugins: {
                 legend: {
-                    display: true,
-                    labels: {
-                        usePointStyle: true,
-
-                        font: { size: 12, weight: '600' }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'Trung bình: ' + context.raw + ' cái/ngày';
-                        }
-                    }
+                    position: 'bottom',
+                    labels: { usePointStyle: true, boxWidth: 8, font: { size: 12, weight: '600' } }
                 }
             }
         }

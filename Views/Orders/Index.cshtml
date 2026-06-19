@@ -15,8 +15,9 @@
         </div>
 
         <div class="flex gap-3">
-            @if (!User.IsInRole("Embroidery"))
+            @if (!User.IsInRole("Embroidery")&& !User.IsInRole("Admin"))
             {
+
                 <a asp-action="Create" class="btn-main">
                     <span class="material-symbols-outlined text-[20px]">add</span>
                     Tạo đơn mới

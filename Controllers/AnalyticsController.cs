@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using DOAN_BTF.Models;
 using Microsoft.AspNetCore.Authorization;
+using DOAN_BTF.Services.ML;
 
 namespace DOAN_BTF.Controllers
 {
@@ -9,10 +10,18 @@ namespace DOAN_BTF.Controllers
     public class AnalyticsController : Controller
     {
         private readonly DOAN_BTF_Context _context;
+        private readonly MlTrainingService _mlTrainingService;
 
-        public AnalyticsController(DOAN_BTF_Context context)
+        public AnalyticsController(DOAN_BTF_Context context, MlTrainingService mlTrainingService)
         {
             _context = context;
+            _mlTrainingService = mlTrainingService;
+        }
+        [HttpGet]
+        public IActionResult TrainAi()
+        {
+            var result = _mlTrainingService.TrainProductVariantModel();
+            return Content(result);
         }
 
         public async Task<IActionResult> Index(int? roomId, int? shopId, DateTime? fromDate, DateTime? toDate)
@@ -142,7 +151,7 @@ namespace DOAN_BTF.Controllers
                 {
                     ViewBag.ForecastStatus = "Danger";
                     ViewBag.ForecastMessage =
-                        $"[CẢNH BÁO NHẬP HÀNG] Mẫu phôi '{alertVariant?.Product?.ProductName} - {alertVariant?.Color}' đang có xu hướng tiêu thụ cao. Trung bình trượt 7 ngày hiện tại là {latestMovingAverage} chiếc/ngày. Dự kiến 30 ngày tới cần khoảng {estimatedNeed30Days} chiếc, trong khi tồn kho hiện tại còn {currentStock} chiếc. Hệ thống đề xuất nhập thêm phôi áo.";
+                        $"[CẢNH BÁO NHẬP HÀNG] Mẫu phôi '{alertVariant?.Product?.ProductName} - {alertVariant?.Color} ' đang có xu hướng tiêu thụ cao. Dự kiến 30 ngày tới cần khoảng {estimatedNeed30Days} chiếc, trong khi tồn kho hiện tại còn {currentStock} chiếc. Hệ thống đề xuất nhập thêm phôi áo.";
                 }
                 else
                 {

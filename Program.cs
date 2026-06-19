@@ -2,14 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
-
+using DOAN_BTF.Services.ML;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<DOAN_BTF_Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Password hasher
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-
+builder.Services.AddScoped<MlTrainingService>();
 // Add cookie authentication
 // Add cookie authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
